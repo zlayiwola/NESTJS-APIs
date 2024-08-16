@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Building Robust APIs with NestJS: A Step-by-Step Guide</title>
+    <link rel="stylesheet" href="swagger.css"> <!-- Assuming you have a stylesheet -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="HNG Boilerplate-Logo.png" alt="HNG Boilerplate Logo">
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#">Docs</a></li>
+                <li><a href="#" style="color: #f88d2b">APIs</a></li>
+                <li><a href="#">Templates</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <aside>
+            <ul>
+                <li><a href="#introduction" style="color: #f88d2b">Introduction</a></li>
+                <li><a href="#step1">Step 1: Setting Up Your NestJS Project</a></li>
+                <li><a href="#step2">Step 2: Creating a Module and Controller</a></li>
+                <li><a href="#step3">Step 3: Implementing Services for Business Logic</a></li>
+                <li><a href="#step4">Step 4: Connecting to a Database</a></li>
+                <li><a href="#step5">Step 5: Securing Your API</a></li>
+                <li><a href="#step6">Step 6: Adding Validation and Error Handling</a></li>
+                <li><a href="#conclusion">Conclusion</a></li>
+            </ul>
+        </aside>
+
+        <section class="full">
+            <h1 style="font-weight: bold;">Building Robust APIs with NestJS: A Step-by-Step Guide</h1>
+            <h2 style="color: #333">Learn how to create secure, scalable, and efficient APIs using the NestJS framework.</h2>
+            
+
+            <section id="introduction">
+              <p>NestJS is a powerful Node.js framework that provides a robust and scalable architecture for building APIs. If you’re looking to create secure, scalable, and efficient APIs, NestJS is an excellent choice. This guide will walk you through the essential steps to build a strong NestJS API that meets modern development standards.</p>
+            </section>
+            <hr>
+            <section id="step1">
+                <h3>Step 1: Setting Up Your NestJS Project</h3>
+                <p>To get started with NestJS Swagger integration, the first step is to install the necessary packages. You’ll need both <code>@nestjs/swagger </code>and <code> swagger-ui-express </code>. These packages will allow you to create and serve your API documentation.</p>
+                <p>Start by installing the NestJS CLI and creating a new project:</p>
+                <pre class="code-block">
+                    <code>
+npm install -g @nestjs/cli
+npx nest new my-nestjs-app
+                    </code>
+                </pre>
+                <p>This command sets up a new NestJS project with a modular structure, which is key to building scalable applications.</p>
+            </section>
+
+            <section id="step2">
+                <h3>Step 2: Creating a Module and Controller</h3>
+                <p>NestJS promotes a modular architecture, making it easy to organize your API into feature-based modules.</p>
+                <p>For example, let’s create a Users module:</p>
+                <pre class="code-block">
+                    <code>
+nest generate module users
+nest generate controller users
+                    </code>
+                </pre>
+                <p>This creates a UsersModule and a UsersController where you can define your API endpoints.</p>
+                <p>In users.controller.ts, you can define your first API route:</p>
+                <pre class="code-block"><code>
+import { Controller, Get } from '@nestjs/common';
+
+@Controller("users")
+export class UsersController {
+    @Get()
+     findAll(){
+        return "This action returns all users";
+   }
+}
+                </code></pre>
+                <p>This simple route is the foundation of your NestJS API, returning a list of users when accessed.</p>
+            </section>
+
+            <section id="step3">
+                <h3>Step 3: Implementing Services for Business Logic</h3>
+                <p>To keep your code clean and maintainable, separate your business logic into services. Generate a service for the Users module:</p>
+                <p>For example:</p>
+                <pre class="code-block"><code>
+nest generate service users
+                </code></pre>
+                <p>Now, move the logic from the controller to the service:</p>
+                <pre class="code-block">
+                    <code>
+import { Injectable } from '@nestjs/common';
+
+@Injectable()
+export class UsersService {
+     findAll(){
+        return ‘This action returns all users’ ; 
+   }
+}
+
+                    </code>
+                </pre>
+                <p>Update the UsersController to use this service:</p>
+                <pre class="code-block"><code>
+import { Controller, Get } from '@nestjs/common';
+import { UserService } from './users.service';
+
+@Controller(‘users’)
+export class UsersController {
+     constructor(private readonly usersService:  UsersService) {} 
+
+      @Get()
+      findAll(){
+          return this.usersService.findAll(); 
+   }
+}
+                </code></pre>
+                <p>This separation of concerns makes your NestJS API easier to test and maintain.</p>
+            </section>
+
+            <section id="step4">
+                <h3>Step 4: Connecting to a Database</h3>
+                <p>A robust API often requires a database connection. NestJS provides seamless integration with various databases using TypeORM. To connect to a database, first, install the necessary packages:</p>
+                <pre class="code-block">
+                    <code>
+nest install  --save  @nextjs/typeorm  typeorm  pg
+                    </code>
+                </pre>
+                <p>Then, configure the database connection in app.module.ts:</p>
+                <pre class="code-block">
+                    <code>
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UsersModule } from './users/users.module';
+                      
+@Module( {
+imports:  [
+TypeOrmModule.forRoot( {
+    type:  ‘postgres’ ,
+    host:  ‘localhost’ ,
+    port:  5432 ,
+    username:  ‘test’ ,
+    password:  ‘test’ ,
+    database:  ‘test’ ,
+    entities:  [ ] ,
+    synchronize:  true ,
+    } ),
+  UserModule,
+  ],
+} )
+export class AppModule {}
+                    </code>
+                </pre>
+                <p>This configuration connects your NextJS API to a PostgreSQL database. Replace the connection details with your actual database credentials.</p>
+            </section>
+
+            <section id="step5">
+                <h3>Step 5: Securing Your API</h3>
+                <p>Security is critical for any API. NestJS makes it easy to implement security features like authentication and authorization. One of the most common methods is using JWT (JSON Web Tokens)</p>
+                <p>First, install the necessary packages:</p>
+                <pre class="code-block">
+                    <code>
+npm install  --save  @nestjs/jwt  @nestjs/passport  passport  passport-jwt
+                    </code>
+                </pre>
+                    <p>Then, configure JWT authentication in your module and create guards to protect your routes. </p>
+                    <p>Here’s a basic setup:</p>
+                    <pre class="code-block"><code>
+import { Module } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
+import { PassprtModule } from '@nestjs/passport';
+import { UsersModule } from './users/users.module';
+import { AuthService } from './auth/auth.service';
+import { JwtStrategy } from './auth/jwt.strategy';
+
+
+@Module( {
+    imports:  [
+      UserModule, 
+      PassportModule, 
+      JwtModule.register( {
+          secret:  ‘postgres’ ,
+          signOptions:  {  expiresIn:   ‘60s’  } ,
+       } ),
+       UserModule,
+   ],
+   providers:  [AuthService, JwtStrategy],
+} )
+export class AppModule {}
+                    </code></pre>
+                <p>This setup secures your NestJS API endpoints, ensuring only authenticated users can access certain routes.</p>
+                <p>This separation of concerns makes your NestJS API easier to test and maintain.</p>
+            </section>
+
+            <section id="step6">
+                <h3>Step 6: Adding Validation and Error Handling</h3>
+                <p>NestJS provides decorators and pipes for easy validation. For example, to validate input data, you can use class-validator:</p>
+                <p>First, install the necessary packages:</p>
+                <pre class="code-block">
+                    <code>
+npm install  --save class-validator  class-transformer
+                    </code>
+                </pre>
+                <p>Then, create a DTO (Data Transfer Object) with validation rules:</p>
+                <pre class="code-block"><code>
+import { IsString, IsNotEmpty } from 'class-validator';
+
+export class CreateUserDto {
+     @IsString()
+     @IsNotEmpty()
+      readonly name: string;
+
+      @IsString()
+     @IsNotEmpty()
+      readonly email: string;
+}
+                </code>
+              </pre>
+              <p>Apply this DTO in your controller to validate incoming requests:</p>
+              <pre class="code-block"><code>
+import { Body , Controller, Post } from '@nestjs/common';
+import { CreateUserDto } from './create-user.dto';
+
+@Controller(‘users’)
+export class UsersController {
+      @Get()
+     create(@Body()   createUserDto:  CreateUserDto) {} 
+          return ‘User ${createUserDto.name}  created’ ; 
+   }
+}
+              </code></pre>
+              <p>This ensures that your NestJS API only processes valid data, reducing potential errors and improving security.</p>
+            </section>
+
+            <section id="conclusion">
+                <h3>Conclusion</h3>
+                <p>Building a robust API with NestJS is straightforward, thanks to its modular architecture, built-in security features, and TypeScript support. By following this guide, you can create a secure, scalable, and efficient NestJS API that meets the demands of modern web applications. Whether you're connecting to a database, implementing security, or validating input, NestJS provides the tools you need to build a professional-grade API.</p>
+            </section>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-left">
+            <div class="logo">
+                <img src="HNG Boilerplate-Logo.png" alt="HNG Boilerplate Logo">
+            </div>
+            <p>10111, Hornchurch, London, United Kingdom</p>
+        </div>
+        <div class="footer-right">
+            <div class="footer-navigation">
+                <h4>Navigation</h4>
+                <ul>
+                    <li><a href="#" style="color: #f88d2b">Home</a></li>
+                    <li><a href="#">About us</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Feature updates</a></li>
+                    <li><a href="#">Blog</a></li>
+                </ul>
+            </div>
+            <div class="footer-support">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="#">Help Center</a></li>
+                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#">Waiting list</a></li>
+                    <li><a href="#">Pricing Experience</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                </ul>
+            </div>
+            <div class="footer-legal">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms and condition</a></li>
+                </ul>
+            </div>
+            <div class="newsletter">
+                <h4>Sign Up For Newsletter</h4>
+                <input type="email" placeholder="Enter Email">
+                <button>Subscribe</button>
+            </div>
+        </div>
+        <hr style="color: #525252;">
+        <div class="footer-bottom">
+            <div class="social-media">
+                <a href="#"><img src="f.png" alt="Facebook"></a>
+                <a href="#"><img src="x.png" alt="Twitter"></a>
+                <a href="#"><img src="in.png" alt="LinkedIn"></a>
+                <a href="#"><img src="ig.png" alt="Instagram"></a>
+            </div>
+            <div>
+                <p style="color: #cbd5e1;">&copy; 2024 All Rights Reserved</p>
+            </div>
+            <div class="footer-bottom-right">
+                <div>
+                    <p>Privacy Policy</p>
+                </div>
+                <div>
+                    <p>Terms of Use</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
